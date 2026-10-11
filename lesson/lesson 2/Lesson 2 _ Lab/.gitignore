@@ -1,0 +1,13 @@
+# Môi trường ảo — KHÔNG commit
+.venv/
+venv/
+
+# Cache Python (bytecode sinh tự động)
+__pycache__/
+*.pyc
+
+# Secrets
+.env
+
+# Data nặng
+data/*.csv
