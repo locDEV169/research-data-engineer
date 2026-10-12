@@ -1,0 +1,4 @@
+# Cache Python (bytecode sinh tự động)
+__pycache__/
+*.pycx
+*.DS_Store
