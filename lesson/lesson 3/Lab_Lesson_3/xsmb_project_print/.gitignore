@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+venv/
+.venv/
+full_draws.json
+xsmb_results.csv
