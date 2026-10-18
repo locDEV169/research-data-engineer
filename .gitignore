@@ -2,3 +2,9 @@
 __pycache__/
 *.pycx
 *.DS_Store
+
+# Secrets
+.env
+
+# Môi trường ảo
+.venv/
