@@ -1,0 +1,16 @@
+# Môi trường ảo
+.venv/
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# Secrets — TUYỆT ĐỐI không commit
+.env
+key.json
+*.json.key
+service-account*.json
+
+# Dữ liệu nặng
+data/*.csv
+!data/weather.csv        # giữ lại file mẫu nhỏ để demo
