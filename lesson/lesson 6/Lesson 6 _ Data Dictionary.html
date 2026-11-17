@@ -1,0 +1,666 @@
+<meta charset="UTF-8">
+<title>Core Banking Data Dictionary</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --surface:#FFFFFF;
+    --surface-2:#EEF4FC;
+    --ink:#15315A;
+    --ink-soft:#4C6685;
+    --ink-faint:#8298B3;
+    --border:#D3E1F0;
+    --border-soft:#E5EDF7;
+    --accent:#1D5DBF;
+    --accent-strong:#0F3E82;
+    --accent-soft:#E3EDFB;
+    --accent-2:#2F72C4;
+    --accent-2-soft:#EAF2FC;
+    --fk-line:#6FA0D8;
+    --status-success:#1D7A5F;
+    --status-pending:#B0791E;
+    --status-failed:#B0432F;
+    --shadow: 0 1px 2px rgba(21,49,90,.06);
+    --shadow-lg: 0 10px 28px rgba(21,49,90,.12);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0B1420;
+      --surface:#101B2B;
+      --surface-2:#16233A;
+      --ink:#DCE7F5;
+      --ink-soft:#9FB6D1;
+      --ink-faint:#6F87A3;
+      --border:#233A57;
+      --border-soft:#1C2F48;
+      --accent:#5B9BEA;
+      --accent-strong:#8FC0FF;
+      --accent-soft:#14273F;
+      --accent-2:#4C86D6;
+      --accent-2-soft:#122239;
+      --fk-line:#5C86B8;
+      --status-success:#4FB098;
+      --status-pending:#D9AE5C;
+      --status-failed:#D9825E;
+      --shadow: 0 1px 2px rgba(0,0,0,.35);
+      --shadow-lg: 0 10px 28px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0B1420;
+    --surface:#101B2B;
+    --surface-2:#16233A;
+    --ink:#DCE7F5;
+    --ink-soft:#9FB6D1;
+    --ink-faint:#6F87A3;
+    --border:#233A57;
+    --border-soft:#1C2F48;
+    --accent:#5B9BEA;
+    --accent-strong:#8FC0FF;
+    --accent-soft:#14273F;
+    --accent-2:#4C86D6;
+    --accent-2-soft:#122239;
+    --fk-line:#5C86B8;
+    --status-success:#4FB098;
+    --status-pending:#D9AE5C;
+    --status-failed:#D9825E;
+    --shadow: 0 1px 2px rgba(0,0,0,.35);
+    --shadow-lg: 0 10px 28px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box;}
+  body{background:var(--bg); color:var(--ink); font-family:'Be Vietnam Pro',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:15px; line-height:1.55;}
+  h1,h2,h3{font-family:'Be Vietnam Pro',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-weight:600; text-wrap:balance; margin:0; color:var(--ink);}
+  code, .mono{font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+  a{color:var(--accent);}
+  ::selection{background:var(--accent-soft);}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important;} }
+
+  .page{max-width:1360px; margin:0 auto; padding:0 clamp(16px,3vw,40px) 80px;}
+
+  /* ---------- Masthead ---------- */
+  .masthead{padding:40px 0 28px; border-bottom:1px solid var(--border);}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:.72rem; letter-spacing:.12em; text-transform:uppercase; color:var(--accent-2); font-weight:600;}
+  .masthead h1{font-size:clamp(2rem,1.5rem + 2vw,2.75rem); font-weight:500; margin-top:.35em;}
+  .masthead .sub{color:var(--ink-soft); max-width:62ch; margin-top:.6em; font-size:1rem;}
+  .stat-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:24px;}
+  .stat{background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px 16px; min-width:132px; box-shadow:var(--shadow);}
+  .stat .n{font-family:'IBM Plex Mono',monospace; font-variant-numeric:tabular-nums; font-size:1.25rem; font-weight:600; color:var(--accent-strong);}
+  .stat .l{font-size:.74rem; color:var(--ink-faint); margin-top:2px;}
+
+  /* ---------- Layout: rail + content ---------- */
+  .layout{display:grid; grid-template-columns:216px 1fr; gap:44px; align-items:start; margin-top:32px;}
+  .rail{position:sticky; top:20px; align-self:start; padding:6px 0 40px; border-right:1px solid var(--border-soft);}
+  .rail .rail-title{font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); font-weight:600; margin-bottom:10px;}
+  .rail nav{display:flex; flex-direction:column; gap:2px; font-size:.87rem;}
+  .rail a{color:var(--ink-soft); text-decoration:none; padding:5px 10px; border-radius:6px; border-left:2px solid transparent;}
+  .rail a:hover{color:var(--ink); background:var(--surface-2);}
+  .rail a.tbl{font-family:'IBM Plex Mono',monospace; font-size:.78rem; padding-left:20px;}
+  .rail .rail-group{margin-top:16px;}
+  .rail .rail-group:first-child{margin-top:0;}
+
+  @media (max-width:880px){
+    .layout{grid-template-columns:1fr;}
+    .rail{position:static; border-right:none; border-bottom:1px solid var(--border-soft); padding-bottom:16px;}
+    .rail nav{flex-direction:row; flex-wrap:wrap;}
+    .rail a.tbl{padding-left:10px;}
+  }
+
+  section{margin-top:64px; scroll-margin-top:20px;}
+  section > h2{font-size:1.55rem; font-weight:500;}
+  section > .lead{color:var(--ink-soft); max-width:70ch; margin-top:.5em;}
+
+  /* ---------- Business domains ---------- */
+  .domain-grid{margin-top:20px; display:grid; grid-template-columns:repeat(auto-fill, minmax(240px,1fr)); gap:14px;}
+  .domain{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:var(--shadow);}
+  .domain h3{font-size:.95rem; font-weight:600; color:var(--accent-strong);}
+  .domain p{color:var(--ink-soft); font-size:.86rem; margin-top:.4em;}
+
+  /* ---------- Relationship diagram (Mermaid ERD) ---------- */
+  .legend{display:flex; flex-wrap:wrap; gap:18px; margin:20px 0 4px; font-size:.82rem; color:var(--ink-soft);}
+  .legend .li{display:flex; align-items:center; gap:7px;}
+  .legend .badge-demo{display:inline-flex;}
+
+  .erd-wrap{margin-top:24px; overflow-x:auto; border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow); background:var(--surface); padding:12px;}
+  .erd-canvas{min-width:820px; display:flex; align-items:center; justify-content:center; min-height:120px;}
+  .erd-canvas svg{max-width:none !important;}
+  .erd-loading{color:var(--ink-faint); font-size:.85rem; padding:40px 0;}
+  .erd-note{margin-top:12px; font-size:.82rem; color:var(--status-pending); background:var(--accent-2-soft); border:1px solid var(--border); border-radius:8px; padding:10px 14px;}
+
+  .rel-wrap{margin-top:16px; overflow-x:auto; border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow);}
+  table.rel-table{width:100%; border-collapse:collapse; font-size:.86rem; min-width:760px; background:var(--surface);}
+  table.rel-table th{text-align:left; font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); font-weight:600; padding:10px 18px; background:var(--surface-2); white-space:nowrap;}
+  table.rel-table td{padding:10px 18px; border-top:1px solid var(--border-soft); vertical-align:middle; white-space:nowrap;}
+  table.rel-table td.child{font-weight:700; color:var(--accent-strong); border-right:1px solid var(--border-soft); background:var(--surface-2);}
+  table.rel-table td.child a{color:inherit; text-decoration:none;}
+  table.rel-table td.child a:hover{text-decoration:underline;}
+  table.rel-table td a.tref{color:var(--accent); text-decoration:none;}
+  table.rel-table td a.tref:hover{text-decoration:underline;}
+  table.rel-table td.arrow{color:var(--ink-faint); padding-left:4px; padding-right:4px; text-align:center;}
+  table.rel-table td.card{text-align:center;}
+  table.rel-table td.note{color:var(--ink-soft); white-space:normal; min-width:260px;}
+  table.rel-table tbody tr:first-child td{border-top:2px solid var(--border);}
+  .used-yes{color:var(--accent-strong); font-weight:600;}
+  .used-no{color:var(--ink-faint);}
+
+  .query-card{margin-top:32px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 22px; box-shadow:var(--shadow);}
+  .query-card h3{font-size:.95rem; font-family:'Be Vietnam Pro',sans-serif; font-weight:600;}
+  .query-card p{color:var(--ink-soft); font-size:.88rem; margin:.5em 0 1em;}
+  pre.sql{margin:0; overflow-x:auto; font-family:'IBM Plex Mono',monospace; font-size:.82rem; line-height:1.6; background:var(--surface-2); border-radius:8px; padding:16px 18px;}
+  pre.sql .kw{color:var(--accent-strong); font-weight:600;}
+  pre.sql .cm{color:var(--ink-faint); font-style:italic;}
+
+  /* ---------- Dictionary cards ---------- */
+  .table-card{margin-top:28px; background:var(--surface); border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow); overflow:hidden; scroll-margin-top:20px;}
+  .table-card .hd{display:flex; flex-wrap:wrap; align-items:baseline; gap:10px 16px; padding:18px 22px 14px; border-bottom:1px solid var(--border-soft);}
+  .table-card .hd .t{font-family:'IBM Plex Mono',monospace; font-size:1.15rem; font-weight:600;}
+  .chip{font-family:'IBM Plex Mono',monospace; font-size:.7rem; padding:3px 9px; border-radius:99px; background:var(--surface-2); color:var(--ink-soft); font-variant-numeric:tabular-nums;}
+  .table-card .desc{padding:0 22px 18px; color:var(--ink-soft); font-size:.9rem; max-width:80ch;}
+  .col-wrap{overflow-x:auto;}
+  table.cols{width:100%; border-collapse:collapse; font-size:.85rem; min-width:640px;}
+  table.cols th{text-align:left; font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); font-weight:600; padding:8px 22px; background:var(--surface-2); position:sticky; top:0;}
+  table.cols td{padding:9px 22px; border-top:1px solid var(--border-soft); vertical-align:top;}
+  table.cols td.name{font-family:'IBM Plex Mono',monospace; font-weight:600; white-space:nowrap;}
+  table.cols td.type{font-family:'IBM Plex Mono',monospace; color:var(--ink-soft); white-space:nowrap;}
+  table.cols td.note{color:var(--ink-soft);}
+  table.cols tr:last-child td{padding-bottom:14px;}
+  .badge{display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:600; padding:2px 7px; border-radius:5px; white-space:nowrap;}
+  .badge.pk{background:var(--accent-2-soft); color:var(--accent-2);}
+  .badge.fk{background:var(--accent-soft); color:var(--accent-strong);}
+  .null-yes{color:var(--ink-faint);}
+  .null-no{color:var(--ink);}
+
+  footer{margin-top:80px; padding-top:24px; border-top:1px solid var(--border); color:var(--ink-faint); font-size:.8rem; display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px;}
+  footer .mono{color:var(--ink-faint);}
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <div class="eyebrow">Huydata - JDE</div>
+    <h1>Core Banking Data Dictionary</h1>
+    <p class="sub">Data Dictionary và Data Modeling của nghiệp vụ thanh toán - dữ liệu ngân hàng (khách hàng, tài khoản, thẻ, giao dịch) dùng cho bài lab ELT PostgreSQL → BigQuery.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="n">11</div><div class="l">bảng dữ liệu</div></div>
+      <div class="stat"><div class="n">~207K</div><div class="l">dòng dữ liệu</div></div>
+      <div class="stat"><div class="n">50,000</div><div class="l">giao dịch (fact)</div></div>
+      <div class="stat"><div class="n">0</div><div class="l">FK constraint khai báo</div></div>
+      <div class="stat"><div class="n">2026-09-07</div><div class="l">ngày trích xuất schema</div></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="rail">
+      <div class="rail-group">
+        <div class="rail-title">Nội dung</div>
+        <nav>
+          <a href="#overview">Tổng quan schema</a>
+          <a href="#relationship-map">Mối quan hệ giữa các bảng</a>
+          <a href="#dictionary">Từ điển dữ liệu</a>
+        </nav>
+      </div>
+      <div class="rail-group">
+        <div class="rail-title">11 bảng</div>
+        <nav>
+          <a class="tbl" href="#dict-customers">customers</a>
+          <a class="tbl" href="#dict-branches">branches</a>
+          <a class="tbl" href="#dict-products">products</a>
+          <a class="tbl" href="#dict-currencies">currencies</a>
+          <a class="tbl" href="#dict-channels">channels</a>
+          <a class="tbl" href="#dict-transaction_types">transaction_types</a>
+          <a class="tbl" href="#dict-merchants">merchants</a>
+          <a class="tbl" href="#dict-accounts">accounts</a>
+          <a class="tbl" href="#dict-cards">cards</a>
+          <a class="tbl" href="#dict-transactions">transactions</a>
+          <a class="tbl" href="#dict-transaction_status_history">transaction_status_history</a>
+        </nav>
+      </div>
+    </aside>
+
+    <main class="content">
+
+      <section id="overview">
+        <h2>Tổng quan schema</h2>
+        <p class="lead">Bộ dữ liệu bao gồm 5 nhóm nghiệp vụ:</p>
+        <div class="domain-grid">
+          <div class="domain">
+            <h3>Quản lý khách hàng</h3>
+            <p>Thông tin khách hàng, phân khúc, KYC.</p>
+          </div>
+          <div class="domain">
+            <h3>Quản lý tài khoản và sản phẩm</h3>
+            <p>Tài khoản thanh toán, tiết kiệm, tín dụng, số dư và tiền tệ.</p>
+          </div>
+          <div class="domain">
+            <h3>Quản lý thẻ và thanh toán</h3>
+            <p>Thẻ, merchant, POS và giao dịch thanh toán.</p>
+          </div>
+          <div class="domain">
+            <h3>Xử lý giao dịch đa kênh</h3>
+            <p>Chuyển khoản, nộp/rút tiền, phí; qua Mobile Banking, Internet Banking, ATM, quầy và POS.</p>
+          </div>
+          <div class="domain">
+            <h3>Giám sát trạng thái giao dịch</h3>
+            <p>Thành công, chờ xử lý, thất bại và lịch sử thay đổi trạng thái.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="relationship-map">
+        <h2>Mối quan hệ giữa các bảng</h2>
+        <p class="lead">Sơ đồ ERD nối 11 bảng theo khóa chính → khóa ngoại: mỗi đường có ký hiệu "một–nhiều" (một dòng bảng cha ứng với nhiều dòng bảng con), gắn nhãn là tên cột FK dùng để JOIN. Bấm vào tên bảng trong sơ đồ để nhảy tới mục từ điển chi tiết.</p>
+
+        <div class="legend">
+          <span class="li"><span class="badge pk badge-demo">PK</span> khóa chính</span>
+          <span class="li"><span class="badge fk badge-demo">FK</span> khóa ngoại (logic, không enforce — DB nguồn không khai báo constraint)</span>
+          <span class="li"><span class="mono">||──o{</span> quan hệ một–nhiều: 1 dòng bảng cha ứng với nhiều dòng bảng con</span>
+        </div>
+
+        <div class="erd-wrap">
+          <div id="erd-canvas" class="erd-canvas"><p class="erd-loading">Đang tải sơ đồ…</p></div>
+        </div>
+        <p class="erd-note" id="erd-fallback-note" hidden>Không tải được thư viện vẽ sơ đồ (cần Internet khi mở file lần đầu) — xem bảng quan hệ đầy đủ bên dưới thay thế.</p>
+
+        <div class="rel-wrap" id="rel-table-wrap" hidden>
+        <table class="rel-table">
+          <thead>
+            <tr><th>Bảng con (chứa FK)</th><th>Cột FK</th><th></th><th>Bảng cha (được tham chiếu)</th><th>Quan hệ</th><th>Trong ví dụ</th><th>Ghi chú</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="child"><a href="#dict-products">products</a></td><td class="mono">currency_code</td><td class="arrow">→</td><td class="mono"><a class="tref" href="#dict-currencies">currencies</a>.currency_code</td><td class="card">N–1</td><td class="card used-no">—</td><td class="note">Loại tiền của sản phẩm</td></tr>
+
+            <tr><td class="child" rowspan="4"><a href="#dict-accounts">accounts</a></td><td class="mono">customer_id</td><td class="arrow">→</td><td class="mono"><a class="tref" href="#dict-customers">customers</a>.customer_id</td><td class="card">N–1</td><td class="card used-yes">✓ JOIN</td><td class="note">Chủ tài khoản</td></tr>
+            <tr><td class="mono">branch_id</td><td class="arrow">→</td><td class="mono"><a class="tref" href="#dict-branches">branches</a>.branch_id</td><td class="card">N–1</td><td class="card used-no">—</td><td class="note">Chi nhánh mở tài khoản</td></tr>
+            <tr><td class="mono">product_id</td><td class="arrow">→</td><td class="mono"><a class="tref" href="#dict-products">products</a>.product_id</td><td class="card">N–1</td><td class="card used-yes">✓ JOIN</td><td class="note">Sản phẩm áp dụng</td></tr>
+            <tr><td class="mono">currency_code</td><td class="arrow">→</td><td class="mono"><a class="tref" href="#dict-currencies">currencies</a>.currency_code</td><td class="card">N–1</td><td class="card used-no">—</td><td class="note">Loại tiền của tài khoản</td></tr>
+
+            <tr><td class="child"><a href="#dict-cards">cards</a></td><td class="mono">account_id</td><td class="arrow">→</td><td class="mono"><a class="tref" href="#dict-accounts">accounts</a>.account_id</td><td class="card">N–1</td><td class="card used-no">—</td><td class="note">Tài khoản gắn với thẻ</td></tr>
+
+            <tr><td class="child" rowspan="8"><a href="#dict-transactions">transactions</a></td><td class="mono">source_account_id</td><td class="arrow">→</td><td class="mono"><a class="tref" href="#dict-accounts">accounts</a>.account_id</td><td class="card">N–1</td><td class="card used-yes">✓ JOIN</td><td class="note">Tài khoản nguồn (bên trích tiền)</td></tr>
+            <tr><td class="mono">destination_account_id</td><td class="arrow">→</td><td class="mono"><a class="tref" href="#dict-accounts">accounts</a>.account_id</td><td class="card">N–1</td><td class="card used-no">—</td><td class="note">Tài khoản đích, chỉ có ở GD chuyển khoản — cùng trỏ về accounts nên phải JOIN 2 lần với alias khác nhau</td></tr>
+            <tr><td class="mono">card_id</td><td class="arrow">→</td><td class="mono"><a class="tref" href="#dict-cards">cards</a>.card_id</td><td class="card">N–1</td><td class="card used-no">—</td><td class="note">Thẻ dùng để thực hiện GD, nếu có</td></tr>
+            <tr><td class="mono">merchant_id</td><td class="arrow">→</td><td class="mono"><a class="tref" href="#dict-merchants">merchants</a>.merchant_id</td><td class="card">N–1</td><td class="card used-yes">✓ LEFT JOIN</td><td class="note">Không phải GD nào cũng có merchant</td></tr>
+            <tr><td class="mono">branch_id</td><td class="arrow">→</td><td class="mono"><a class="tref" href="#dict-branches">branches</a>.branch_id</td><td class="card">N–1</td><td class="card used-no">—</td><td class="note">Chi nhánh nơi GD xảy ra — khác branch của account</td></tr>
+            <tr><td class="mono">channel_id</td><td class="arrow">→</td><td class="mono"><a class="tref" href="#dict-channels">channels</a>.channel_id</td><td class="card">N–1</td><td class="card used-yes">✓ JOIN</td><td class="note">Kênh thực hiện giao dịch</td></tr>
+            <tr><td class="mono">transaction_type_id</td><td class="arrow">→</td><td class="mono"><a class="tref" href="#dict-transaction_types">transaction_types</a>.transaction_type_id</td><td class="card">N–1</td><td class="card used-yes">✓ JOIN</td><td class="note">Loại giao dịch</td></tr>
+            <tr><td class="mono">currency_code</td><td class="arrow">→</td><td class="mono"><a class="tref" href="#dict-currencies">currencies</a>.currency_code</td><td class="card">N–1</td><td class="card used-no">—</td><td class="note">Loại tiền của giao dịch</td></tr>
+
+            <tr><td class="child"><a href="#dict-transaction_status_history">transaction_status_history</a></td><td class="mono">transaction_id</td><td class="arrow">→</td><td class="mono"><a class="tref" href="#dict-transactions">transactions</a>.transaction_id</td><td class="card">N–1</td><td class="card used-no">—</td><td class="note">~2,6 sự kiện đổi trạng thái / giao dịch</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <div class="query-card">
+          <h3>Câu truy vấn phía sau các đường đậm</h3>
+          <p>6 quan hệ được tô đậm trong sơ đồ trên chính là 6 lượt JOIN trong câu truy vấn ví dụ này — lấy toàn bộ giao dịch của một khách hàng kèm tên gọi dễ đọc thay vì các mã <code class="mono">_id</code>.</p>
+          <pre class="sql"><span class="kw">SELECT</span>
+    c.customer_id, c.full_name, c.customer_segment,
+    a.account_number, p.product_name,
+    t.transaction_reference, t.transaction_time,
+    ch.channel_name, tt.transaction_type_name, m.merchant_name,
+    t.amount, t.fee_amount, t.currency_code, t.status
+<span class="kw">FROM</span> transactions t
+<span class="kw">JOIN</span> accounts  a  <span class="kw">ON</span> a.account_id  = t.source_account_id
+<span class="kw">JOIN</span> customers c  <span class="kw">ON</span> c.customer_id = a.customer_id
+<span class="kw">JOIN</span> products  p  <span class="kw">ON</span> p.product_id  = a.product_id
+<span class="kw">JOIN</span> channels  ch <span class="kw">ON</span> ch.channel_id = t.channel_id
+<span class="kw">JOIN</span> transaction_types tt <span class="kw">ON</span> tt.transaction_type_id = t.transaction_type_id
+<span class="kw">LEFT JOIN</span> merchants m <span class="kw">ON</span> m.merchant_id = t.merchant_id  <span class="cm">-- không phải GD nào cũng có merchant</span>
+<span class="kw">WHERE</span> c.customer_id = 3921
+<span class="kw">ORDER BY</span> t.transaction_time;</pre>
+        </div>
+      </section>
+
+      <section id="dictionary">
+        <h2>Từ điển dữ liệu</h2>
+        <p class="lead">Chi tiết từng cột: kiểu dữ liệu lấy trực tiếp từ <code class="mono">information_schema.columns</code>, khóa suy luận từ tên cột.</p>
+
+        <!-- customers -->
+        <div class="table-card" id="dict-customers">
+          <div class="hd"><span class="t">customers</span><span class="chip">5,000 dòng</span></div>
+          <p class="desc">Hồ sơ khách hàng cá nhân — thông tin định danh, liên hệ, phân khúc và trạng thái KYC. Là gốc của nhánh "khách hàng → tài khoản".</p>
+          <div class="col-wrap"><table class="cols">
+            <tr><th>Cột</th><th>Kiểu</th><th>Null</th><th>Khóa</th><th>Ý nghĩa</th></tr>
+            <tr><td class="name">customer_id</td><td class="type">BIGINT</td><td class="null-no">NOT NULL</td><td><span class="badge pk">PK</span></td><td class="note">Định danh khách hàng</td></tr>
+            <tr><td class="name">customer_code</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Mã khách hàng nghiệp vụ, hiển thị cho GDV</td></tr>
+            <tr><td class="name">full_name</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Họ tên đầy đủ</td></tr>
+            <tr><td class="name">date_of_birth</td><td class="type">DATE</td><td class="null-no">NOT NULL</td><td></td><td class="note">Ngày sinh</td></tr>
+            <tr><td class="name">gender</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Giới tính</td></tr>
+            <tr><td class="name">phone_number</td><td class="type">TEXT</td><td class="null-yes">NULL</td><td></td><td class="note">Số điện thoại liên hệ</td></tr>
+            <tr><td class="name">email</td><td class="type">TEXT</td><td class="null-yes">NULL</td><td></td><td class="note">Email liên hệ</td></tr>
+            <tr><td class="name">city</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Thành phố cư trú</td></tr>
+            <tr><td class="name">customer_segment</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Phân khúc khách hàng (RETAIL, VIP...)</td></tr>
+            <tr><td class="name">kyc_status</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Trạng thái định danh khách hàng</td></tr>
+            <tr><td class="name">created_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Thời điểm tạo bản ghi ở hệ nguồn</td></tr>
+            <tr><td class="name">updated_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Watermark — dùng cho incremental load</td></tr>
+          </table></div>
+        </div>
+
+        <!-- branches -->
+        <div class="table-card" id="dict-branches">
+          <div class="hd"><span class="t">branches</span><span class="chip">30 dòng</span></div>
+          <p class="desc">Danh mục chi nhánh giao dịch. Được tham chiếu ở hai chỗ khác nhau: chi nhánh <em>mở tài khoản</em> (qua <code class="mono">accounts</code>) và chi nhánh <em>nơi giao dịch xảy ra</em> (qua <code class="mono">transactions</code>) — hai ngữ cảnh JOIN riêng biệt, dễ nhầm.</p>
+          <div class="col-wrap"><table class="cols">
+            <tr><th>Cột</th><th>Kiểu</th><th>Null</th><th>Khóa</th><th>Ý nghĩa</th></tr>
+            <tr><td class="name">branch_id</td><td class="type">BIGINT</td><td class="null-no">NOT NULL</td><td><span class="badge pk">PK</span></td><td class="note">Định danh chi nhánh</td></tr>
+            <tr><td class="name">branch_code</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Mã chi nhánh</td></tr>
+            <tr><td class="name">branch_name</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Tên chi nhánh</td></tr>
+            <tr><td class="name">city</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Thành phố</td></tr>
+            <tr><td class="name">region</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Vùng/miền quản lý</td></tr>
+            <tr><td class="name">opened_date</td><td class="type">DATE</td><td class="null-no">NOT NULL</td><td></td><td class="note">Ngày khai trương chi nhánh</td></tr>
+            <tr><td class="name">is_active</td><td class="type">BOOLEAN</td><td class="null-no">NOT NULL</td><td></td><td class="note">Còn hoạt động hay đã đóng</td></tr>
+            <tr><td class="name">created_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Thời điểm tạo bản ghi</td></tr>
+            <tr><td class="name">updated_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Watermark incremental load</td></tr>
+          </table></div>
+        </div>
+
+        <!-- products -->
+        <div class="table-card" id="dict-products">
+          <div class="hd"><span class="t">products</span><span class="chip">6 dòng</span></div>
+          <p class="desc">Danh mục sản phẩm tài khoản: thanh toán / tiết kiệm / tín dụng, theo từng loại tiền (VND, USD, EUR).</p>
+          <div class="col-wrap"><table class="cols">
+            <tr><th>Cột</th><th>Kiểu</th><th>Null</th><th>Khóa</th><th>Ý nghĩa</th></tr>
+            <tr><td class="name">product_id</td><td class="type">BIGINT</td><td class="null-no">NOT NULL</td><td><span class="badge pk">PK</span></td><td class="note">Định danh sản phẩm</td></tr>
+            <tr><td class="name">product_code</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Mã sản phẩm, vd. SAV_USD</td></tr>
+            <tr><td class="name">product_name</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Tên sản phẩm hiển thị</td></tr>
+            <tr><td class="name">product_type</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">CURRENT_ACCOUNT / SAVINGS_ACCOUNT / CREDIT_ACCOUNT</td></tr>
+            <tr><td class="name">currency_code</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td><span class="badge fk">FK → currencies</span></td><td class="note">Loại tiền của sản phẩm</td></tr>
+            <tr><td class="name">is_active</td><td class="type">BOOLEAN</td><td class="null-no">NOT NULL</td><td></td><td class="note">Còn được bán hay đã ngừng</td></tr>
+            <tr><td class="name">created_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Thời điểm tạo bản ghi</td></tr>
+            <tr><td class="name">updated_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Watermark incremental load</td></tr>
+          </table></div>
+        </div>
+
+        <!-- currencies -->
+        <div class="table-card" id="dict-currencies">
+          <div class="hd"><span class="t">currencies</span><span class="chip">3 dòng</span></div>
+          <p class="desc">Danh mục tiền tệ được hỗ trợ (VND, USD, EUR) và số chữ số thập phân dùng để làm tròn số tiền.</p>
+          <div class="col-wrap"><table class="cols">
+            <tr><th>Cột</th><th>Kiểu</th><th>Null</th><th>Khóa</th><th>Ý nghĩa</th></tr>
+            <tr><td class="name">currency_code</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td><span class="badge pk">PK</span></td><td class="note">Mã ISO tiền tệ, vd. VND</td></tr>
+            <tr><td class="name">currency_name</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Tên đầy đủ của tiền tệ</td></tr>
+            <tr><td class="name">decimal_places</td><td class="type">INTEGER</td><td class="null-no">NOT NULL</td><td></td><td class="note">Số chữ số thập phân khi hiển thị/làm tròn</td></tr>
+            <tr><td class="name">is_active</td><td class="type">BOOLEAN</td><td class="null-no">NOT NULL</td><td></td><td class="note">Còn được giao dịch hay không</td></tr>
+            <tr><td class="name">created_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Thời điểm tạo bản ghi</td></tr>
+            <tr><td class="name">updated_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Watermark incremental load</td></tr>
+          </table></div>
+        </div>
+
+        <!-- channels -->
+        <div class="table-card" id="dict-channels">
+          <div class="hd"><span class="t">channels</span><span class="chip">5 dòng</span></div>
+          <p class="desc">Kênh khách hàng dùng để thực hiện giao dịch: Mobile Banking, Internet Banking, ATM, Quầy giao dịch, POS thẻ.</p>
+          <div class="col-wrap"><table class="cols">
+            <tr><th>Cột</th><th>Kiểu</th><th>Null</th><th>Khóa</th><th>Ý nghĩa</th></tr>
+            <tr><td class="name">channel_id</td><td class="type">BIGINT</td><td class="null-no">NOT NULL</td><td><span class="badge pk">PK</span></td><td class="note">Định danh kênh</td></tr>
+            <tr><td class="name">channel_code</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Mã kênh, vd. MOBILE_BANKING</td></tr>
+            <tr><td class="name">channel_name</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Tên kênh hiển thị</td></tr>
+            <tr><td class="name">is_active</td><td class="type">BOOLEAN</td><td class="null-no">NOT NULL</td><td></td><td class="note">Còn hoạt động hay không</td></tr>
+            <tr><td class="name">created_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Thời điểm tạo bản ghi</td></tr>
+            <tr><td class="name">updated_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Watermark incremental load</td></tr>
+          </table></div>
+        </div>
+
+        <!-- transaction_types -->
+        <div class="table-card" id="dict-transaction_types">
+          <div class="hd"><span class="t">transaction_types</span><span class="chip">5 dòng</span></div>
+          <p class="desc">Loại nghiệp vụ giao dịch: Chuyển khoản, Rút tiền, Nộp tiền, Thanh toán thẻ, Phí dịch vụ.</p>
+          <div class="col-wrap"><table class="cols">
+            <tr><th>Cột</th><th>Kiểu</th><th>Null</th><th>Khóa</th><th>Ý nghĩa</th></tr>
+            <tr><td class="name">transaction_type_id</td><td class="type">BIGINT</td><td class="null-no">NOT NULL</td><td><span class="badge pk">PK</span></td><td class="note">Định danh loại giao dịch</td></tr>
+            <tr><td class="name">transaction_type_code</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Mã loại, vd. TRANSFER</td></tr>
+            <tr><td class="name">transaction_type_name</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Tên loại hiển thị</td></tr>
+            <tr><td class="name">is_active</td><td class="type">BOOLEAN</td><td class="null-no">NOT NULL</td><td></td><td class="note">Còn được sử dụng hay không</td></tr>
+            <tr><td class="name">created_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Thời điểm tạo bản ghi</td></tr>
+            <tr><td class="name">updated_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Watermark incremental load</td></tr>
+          </table></div>
+        </div>
+
+        <!-- merchants -->
+        <div class="table-card" id="dict-merchants">
+          <div class="hd"><span class="t">merchants</span><span class="chip">500 dòng</span></div>
+          <p class="desc">Đơn vị chấp nhận thanh toán thẻ (điểm bán/POS), phân theo ngành hàng và thành phố. Chỉ gắn với các giao dịch loại thanh toán thẻ.</p>
+          <div class="col-wrap"><table class="cols">
+            <tr><th>Cột</th><th>Kiểu</th><th>Null</th><th>Khóa</th><th>Ý nghĩa</th></tr>
+            <tr><td class="name">merchant_id</td><td class="type">BIGINT</td><td class="null-no">NOT NULL</td><td><span class="badge pk">PK</span></td><td class="note">Định danh merchant</td></tr>
+            <tr><td class="name">merchant_code</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Mã merchant</td></tr>
+            <tr><td class="name">merchant_name</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Tên merchant</td></tr>
+            <tr><td class="name">merchant_category</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Ngành hàng, vd. F&amp;B, Retail</td></tr>
+            <tr><td class="name">city</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Thành phố đặt điểm bán</td></tr>
+            <tr><td class="name">is_active</td><td class="type">BOOLEAN</td><td class="null-no">NOT NULL</td><td></td><td class="note">Còn hợp tác hay không</td></tr>
+            <tr><td class="name">created_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Thời điểm tạo bản ghi</td></tr>
+            <tr><td class="name">updated_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Watermark incremental load</td></tr>
+          </table></div>
+        </div>
+
+        <!-- accounts -->
+        <div class="table-card" id="dict-accounts">
+          <div class="hd"><span class="t">accounts</span><span class="chip">7,000 dòng</span></div>
+          <p class="desc">Tài khoản do một khách hàng mở tại một chi nhánh, gắn với một sản phẩm cụ thể. Là điểm nối trung gian bắt buộc phải đi qua khi JOIN từ <code class="mono">customers</code> sang <code class="mono">transactions</code>.</p>
+          <div class="col-wrap"><table class="cols">
+            <tr><th>Cột</th><th>Kiểu</th><th>Null</th><th>Khóa</th><th>Ý nghĩa</th></tr>
+            <tr><td class="name">account_id</td><td class="type">BIGINT</td><td class="null-no">NOT NULL</td><td><span class="badge pk">PK</span></td><td class="note">Định danh tài khoản</td></tr>
+            <tr><td class="name">account_number</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Số tài khoản hiển thị cho khách</td></tr>
+            <tr><td class="name">customer_id</td><td class="type">BIGINT</td><td class="null-no">NOT NULL</td><td><span class="badge fk">FK → customers</span></td><td class="note">Chủ tài khoản</td></tr>
+            <tr><td class="name">branch_id</td><td class="type">BIGINT</td><td class="null-no">NOT NULL</td><td><span class="badge fk">FK → branches</span></td><td class="note">Chi nhánh quản lý tài khoản</td></tr>
+            <tr><td class="name">product_id</td><td class="type">BIGINT</td><td class="null-no">NOT NULL</td><td><span class="badge fk">FK → products</span></td><td class="note">Sản phẩm áp dụng</td></tr>
+            <tr><td class="name">currency_code</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td><span class="badge fk">FK → currencies</span></td><td class="note">Loại tiền của tài khoản</td></tr>
+            <tr><td class="name">account_status</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Trạng thái tài khoản (ACTIVE, CLOSED...)</td></tr>
+            <tr><td class="name">opened_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Thời điểm mở tài khoản</td></tr>
+            <tr><td class="name">closed_at</td><td class="type">TIMESTAMPTZ</td><td class="null-yes">NULL</td><td></td><td class="note">Thời điểm đóng, trống nếu còn mở</td></tr>
+            <tr><td class="name">current_balance</td><td class="type">NUMERIC(18,2)</td><td class="null-no">NOT NULL</td><td></td><td class="note">Số dư hiện tại</td></tr>
+            <tr><td class="name">created_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Thời điểm tạo bản ghi</td></tr>
+            <tr><td class="name">updated_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Watermark incremental load</td></tr>
+          </table></div>
+        </div>
+
+        <!-- cards -->
+        <div class="table-card" id="dict-cards">
+          <div class="hd"><span class="t">cards</span><span class="chip">4,000 dòng</span></div>
+          <p class="desc">Thẻ ngân hàng được phát hành, mỗi thẻ gắn với đúng một tài khoản. Dùng khi giao dịch loại <code class="mono">CARD_PAYMENT</code> qua kênh <code class="mono">CARD_POS</code>.</p>
+          <div class="col-wrap"><table class="cols">
+            <tr><th>Cột</th><th>Kiểu</th><th>Null</th><th>Khóa</th><th>Ý nghĩa</th></tr>
+            <tr><td class="name">card_id</td><td class="type">BIGINT</td><td class="null-no">NOT NULL</td><td><span class="badge pk">PK</span></td><td class="note">Định danh thẻ</td></tr>
+            <tr><td class="name">masked_card_number</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Số thẻ đã che (không lưu số đầy đủ)</td></tr>
+            <tr><td class="name">account_id</td><td class="type">BIGINT</td><td class="null-no">NOT NULL</td><td><span class="badge fk">FK → accounts</span></td><td class="note">Tài khoản gắn với thẻ</td></tr>
+            <tr><td class="name">card_type</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Loại thẻ (DEBIT/CREDIT...)</td></tr>
+            <tr><td class="name">card_status</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Trạng thái thẻ (ACTIVE, BLOCKED...)</td></tr>
+            <tr><td class="name">issued_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Ngày phát hành</td></tr>
+            <tr><td class="name">expired_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Ngày hết hạn</td></tr>
+            <tr><td class="name">created_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Thời điểm tạo bản ghi</td></tr>
+            <tr><td class="name">updated_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Watermark incremental load</td></tr>
+          </table></div>
+        </div>
+
+        <!-- transactions -->
+        <div class="table-card" id="dict-transactions">
+          <div class="hd"><span class="t">transactions</span><span class="chip">50,000 dòng</span></div>
+          <p class="desc"><strong>Bảng fact trung tâm.</strong> Mỗi dòng là một giao dịch tài chính, mang tới 8 khóa ngoại nên là bảng "hội tụ" của gần như mọi JOIN trong hệ thống. Chú ý: <code class="mono">source_account_id</code> và <code class="mono">destination_account_id</code> cùng trỏ về <code class="mono">accounts</code> — muốn lấy tên cả hai bên phải JOIN <code class="mono">accounts</code> hai lần với hai alias khác nhau.</p>
+          <div class="col-wrap"><table class="cols">
+            <tr><th>Cột</th><th>Kiểu</th><th>Null</th><th>Khóa</th><th>Ý nghĩa</th></tr>
+            <tr><td class="name">transaction_id</td><td class="type">BIGINT</td><td class="null-no">NOT NULL</td><td><span class="badge pk">PK</span></td><td class="note">Định danh giao dịch</td></tr>
+            <tr><td class="name">transaction_reference</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Mã tham chiếu giao dịch (hiển thị cho khách)</td></tr>
+            <tr><td class="name">source_account_id</td><td class="type">BIGINT</td><td class="null-yes">NULL</td><td><span class="badge fk">FK → accounts</span></td><td class="note">Tài khoản nguồn (bên trích tiền)</td></tr>
+            <tr><td class="name">destination_account_id</td><td class="type">BIGINT</td><td class="null-yes">NULL</td><td><span class="badge fk">FK → accounts</span></td><td class="note">Tài khoản đích (chỉ có ở giao dịch chuyển khoản)</td></tr>
+            <tr><td class="name">card_id</td><td class="type">BIGINT</td><td class="null-yes">NULL</td><td><span class="badge fk">FK → cards</span></td><td class="note">Thẻ dùng để thực hiện giao dịch, nếu có</td></tr>
+            <tr><td class="name">merchant_id</td><td class="type">BIGINT</td><td class="null-yes">NULL</td><td><span class="badge fk">FK → merchants</span></td><td class="note">Merchant nhận thanh toán, nếu có</td></tr>
+            <tr><td class="name">branch_id</td><td class="type">BIGINT</td><td class="null-yes">NULL</td><td><span class="badge fk">FK → branches</span></td><td class="note">Chi nhánh nơi phát sinh giao dịch (khác branch của tài khoản)</td></tr>
+            <tr><td class="name">channel_id</td><td class="type">BIGINT</td><td class="null-yes">NULL</td><td><span class="badge fk">FK → channels</span></td><td class="note">Kênh thực hiện giao dịch</td></tr>
+            <tr><td class="name">transaction_type_id</td><td class="type">BIGINT</td><td class="null-yes">NULL</td><td><span class="badge fk">FK → transaction_types</span></td><td class="note">Loại giao dịch</td></tr>
+            <tr><td class="name">currency_code</td><td class="type">TEXT</td><td class="null-yes">NULL</td><td><span class="badge fk">FK → currencies</span></td><td class="note">Loại tiền của giao dịch</td></tr>
+            <tr><td class="name">amount</td><td class="type">NUMERIC(18,2)</td><td class="null-yes">NULL</td><td></td><td class="note">Số tiền giao dịch</td></tr>
+            <tr><td class="name">fee_amount</td><td class="type">NUMERIC(18,2)</td><td class="null-yes">NULL</td><td></td><td class="note">Phí giao dịch</td></tr>
+            <tr><td class="name">status</td><td class="type">TEXT</td><td class="null-yes">NULL</td><td></td><td class="note">SUCCESS / PENDING / FAILED</td></tr>
+            <tr><td class="name">failure_reason</td><td class="type">TEXT</td><td class="null-yes">NULL</td><td></td><td class="note">Lý do thất bại, chỉ có khi status = FAILED</td></tr>
+            <tr><td class="name">transaction_time</td><td class="type">TIMESTAMPTZ</td><td class="null-yes">NULL</td><td></td><td class="note">Thời điểm giao dịch thực tế xảy ra</td></tr>
+            <tr><td class="name">created_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Thời điểm tạo bản ghi ở hệ nguồn</td></tr>
+            <tr><td class="name">updated_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Watermark incremental load</td></tr>
+          </table></div>
+        </div>
+
+        <!-- transaction_status_history -->
+        <div class="table-card" id="dict-transaction_status_history">
+          <div class="hd"><span class="t">transaction_status_history</span><span class="chip">130,126 dòng</span></div>
+          <p class="desc">Nhật ký đổi trạng thái của từng giao dịch (audit trail) — quan hệ 1-N với <code class="mono">transactions</code>, trung bình mỗi giao dịch có ~2.6 sự kiện đổi trạng thái. Ví dụ điển hình để dạy <code class="mono">GROUP BY</code> + <code class="mono">COUNT</code> sau JOIN.</p>
+          <div class="col-wrap"><table class="cols">
+            <tr><th>Cột</th><th>Kiểu</th><th>Null</th><th>Khóa</th><th>Ý nghĩa</th></tr>
+            <tr><td class="name">event_id</td><td class="type">BIGINT</td><td class="null-no">NOT NULL</td><td><span class="badge pk">PK</span></td><td class="note">Định danh sự kiện đổi trạng thái</td></tr>
+            <tr><td class="name">transaction_id</td><td class="type">BIGINT</td><td class="null-no">NOT NULL</td><td><span class="badge fk">FK → transactions</span></td><td class="note">Giao dịch liên quan</td></tr>
+            <tr><td class="name">old_status</td><td class="type">TEXT</td><td class="null-yes">NULL</td><td></td><td class="note">Trạng thái trước đó, trống nếu là sự kiện khởi tạo</td></tr>
+            <tr><td class="name">new_status</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Trạng thái mới</td></tr>
+            <tr><td class="name">event_time</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Thời điểm đổi trạng thái</td></tr>
+            <tr><td class="name">source_system</td><td class="type">TEXT</td><td class="null-no">NOT NULL</td><td></td><td class="note">Hệ thống ghi nhận sự kiện</td></tr>
+            <tr><td class="name">created_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Thời điểm tạo bản ghi</td></tr>
+            <tr><td class="name">updated_at</td><td class="type">TIMESTAMPTZ</td><td class="null-no">NOT NULL</td><td></td><td class="note">Watermark incremental load</td></tr>
+          </table></div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <span>Pipeline: <span class="mono">banking_bigquery_elt</span> · Nguồn: PostgreSQL <span class="mono">core_banking</span> (schema public, không FK constraint)</span>
+    <span>Tài liệu tham khảo cho Lesson 6 — Production Data Pipeline</span>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js" onerror="window.__erdLibFailed=true"></script>
+<script>
+(function(){
+  var ERD_SOURCE = [
+    'erDiagram',
+    '    CUSTOMERS ||--o{ ACCOUNTS : customer_id',
+    '    BRANCHES ||--o{ ACCOUNTS : branch_id',
+    '    PRODUCTS ||--o{ ACCOUNTS : product_id',
+    '    CURRENCIES ||--o{ ACCOUNTS : currency_code',
+    '    CURRENCIES ||--o{ PRODUCTS : currency_code',
+    '    ACCOUNTS ||--o{ CARDS : account_id',
+    '    ACCOUNTS ||--o{ TRANSACTIONS : source_account_id',
+    '    ACCOUNTS ||--o{ TRANSACTIONS : destination_account_id',
+    '    CARDS ||--o{ TRANSACTIONS : card_id',
+    '    BRANCHES ||--o{ TRANSACTIONS : branch_id',
+    '    CHANNELS ||--o{ TRANSACTIONS : channel_id',
+    '    TRANSACTION_TYPES ||--o{ TRANSACTIONS : transaction_type_id',
+    '    CURRENCIES ||--o{ TRANSACTIONS : currency_code',
+    '    MERCHANTS ||--o{ TRANSACTIONS : merchant_id',
+    '    TRANSACTIONS ||--o{ TRANSACTION_STATUS_HISTORY : transaction_id',
+    '',
+    '    CUSTOMERS { bigint customer_id PK }',
+    '    BRANCHES { bigint branch_id PK }',
+    '    PRODUCTS {',
+    '        bigint product_id PK',
+    '        text currency_code FK',
+    '    }',
+    '    CURRENCIES { text currency_code PK }',
+    '    CHANNELS { bigint channel_id PK }',
+    '    TRANSACTION_TYPES { bigint transaction_type_id PK }',
+    '    MERCHANTS { bigint merchant_id PK }',
+    '    ACCOUNTS {',
+    '        bigint account_id PK',
+    '        bigint customer_id FK',
+    '        bigint branch_id FK',
+    '        bigint product_id FK',
+    '        text currency_code FK',
+    '    }',
+    '    CARDS {',
+    '        bigint card_id PK',
+    '        bigint account_id FK',
+    '    }',
+    '    TRANSACTIONS {',
+    '        bigint transaction_id PK',
+    '        bigint source_account_id FK',
+    '        bigint destination_account_id FK',
+    '        bigint card_id FK',
+    '        bigint merchant_id FK',
+    '        bigint branch_id FK',
+    '        bigint channel_id FK',
+    '        bigint transaction_type_id FK',
+    '        text currency_code FK',
+    '    }',
+    '    TRANSACTION_STATUS_HISTORY {',
+    '        bigint event_id PK',
+    '        bigint transaction_id FK',
+    '    }'
+  ].join('\n');
+
+  var canvas = document.getElementById('erd-canvas');
+  var fallbackNote = document.getElementById('erd-fallback-note');
+  var fallbackTable = document.getElementById('rel-table-wrap');
+  var TABLE_KEYS = ['customers','branches','products','currencies','channels','transaction_types','merchants','accounts','cards','transactions','transaction_status_history'];
+
+  function showFallback(){
+    canvas.parentElement.style.display = 'none';
+    fallbackNote.hidden = false;
+    fallbackTable.hidden = false;
+  }
+
+  function wireClicks(){
+    var svg = canvas.querySelector('svg');
+    if (!svg) return;
+    svg.querySelectorAll('text').forEach(function(t){
+      var label = (t.textContent || '').trim().toLowerCase();
+      if (TABLE_KEYS.indexOf(label) === -1) return;
+      var g = t.closest('g') || t.parentElement;
+      if (!g || g.__wired) return;
+      g.__wired = true;
+      g.style.cursor = 'pointer';
+      g.addEventListener('click', function(){
+        var target = document.getElementById('dict-' + label);
+        if (target) target.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      });
+    });
+  }
+
+  function themeVars(){
+    var cs = getComputedStyle(document.documentElement);
+    function v(name){ return cs.getPropertyValue(name).trim(); }
+    return {
+      background: v('--bg'),
+      primaryColor: v('--accent-soft'),
+      primaryBorderColor: v('--accent'),
+      primaryTextColor: v('--ink'),
+      lineColor: v('--accent'),
+      secondaryColor: v('--surface-2'),
+      tertiaryColor: v('--surface'),
+      fontFamily: "'IBM Plex Mono', ui-monospace, monospace"
+    };
+  }
+
+  function renderERD(){
+    if (typeof mermaid === 'undefined') { showFallback(); return; }
+    try{
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        themeVariables: themeVars(),
+        er: { layoutDirection: 'TB', useMaxWidth: false, entityPadding: 12, fontSize: 13 },
+        securityLevel: 'strict'
+      });
+      canvas.textContent = ERD_SOURCE;
+      canvas.removeAttribute('data-processed');
+      mermaid.run({ nodes: [canvas] }).then(wireClicks).catch(function(){ showFallback(); });
+    } catch(e){ showFallback(); }
+  }
+
+  function init(){
+    if (window.__erdLibFailed) { showFallback(); return; }
+    renderERD();
+  }
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') { init(); }
+  else { document.addEventListener('DOMContentLoaded', init); }
+
+  // safety net: if nothing rendered within 8s (e.g. slow/broken network), fall back to the table
+  setTimeout(function(){
+    if (!canvas.querySelector('svg')) { showFallback(); }
+  }, 8000);
+
+  if (window.matchMedia){
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){
+      if (typeof mermaid !== 'undefined' && canvas.querySelector('svg')) { renderERD(); }
+    });
+  }
+})();
+</script>
