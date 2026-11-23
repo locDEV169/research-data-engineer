@@ -68,13 +68,34 @@ BTVN_6/
 └── README.md
 ```
 
+## Kết quả Bronze đã verify
+
+Project: `project-81bd20d6-d241-49b7-acf` · Dataset: `banking_bronze`
+
+| Table | Rows |
+|-------|------|
+| branches | 30 |
+| customers | 5000 |
+| products | 6 |
+| accounts | 7000 |
+| channels | 5 |
+| transaction_types | 5 |
+| currencies | 3 |
+| merchants | 500 |
+| cards | 4000 |
+| transactions | 50000 |
+| transaction_status_history | 130126 |
+
+Idempotent check: chạy `02_load_bronze.py` lần 2 — counts không đổi (PASS).
+
 ## Screenshot BigQuery (Phần 2)
 
-> Dán ảnh dataset `banking_bronze` (vài bảng có data) vào đây trước khi nộp.
+> **Cần làm trước khi nộp:** mở [BigQuery Console](https://console.cloud.google.com/bigquery), chụp dataset `banking_bronze` (list tables + preview 1 bảng), lưu vào `docs/bronze_screenshot.png`.
 
 ![bronze-screenshot](./docs/bronze_screenshot.png)
 
 ## Ghi chú
 
 - Chỉ làm **Bronze** — không tạo `banking_clean` / dims / facts trong BTVN này.
+- SA key: không commit. Path máy local (ví dụ `../private_key/...json` tính từ repo root, hoặc absolute path trong `.env`).
 - Lab `Lesson_6_Lab_production` rộng hơn đề; BTVN dừng ở mirror source + MERGE.

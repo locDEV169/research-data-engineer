@@ -16,16 +16,44 @@ def get_env(name, default=None):
     return value
 
 
+def _resolve_credentials_path(cred: str) -> Path | None:
+    """Resolve SA key path: absolute, cwd, or relative to project/repo roots."""
+    raw = Path(cred).expanduser()
+    candidates = [raw]
+    if not raw.is_absolute():
+        candidates.extend(
+            [
+                PROJECT_ROOT / raw,
+                PROJECT_ROOT.parent / raw,  # ../private_key from BTVN_6
+                PROJECT_ROOT.parents[2] / raw,  # repo root relative
+                PROJECT_ROOT.parents[3] / raw.name if raw.name else raw,  # sibling folder
+            ]
+        )
+        # Common layout: <parent>/private_key/<file> next to research-data-engineer/
+        candidates.append(PROJECT_ROOT.parents[3] / "private_key" / raw.name)
+        candidates.append(PROJECT_ROOT.parents[2].parent / "private_key" / raw.name)
+    for path in candidates:
+        try:
+            resolved = path.resolve()
+        except OSError:
+            continue
+        if resolved.exists():
+            return resolved
+    return None
+
+
 def _prepare_gcp_credentials():
-    """If SA key path in .env is missing, fall back to ADC."""
+    """Resolve SA key path; if missing, fall back to ADC."""
     cred = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "")
     if not cred:
         return
-    path = Path(cred).expanduser()
-    if not path.exists():
-        print(f"WARN: SA key not found: {path}")
+    resolved = _resolve_credentials_path(cred)
+    if resolved is None:
+        print(f"WARN: SA key not found: {cred}")
         print("Falling back to Application Default Credentials (gcloud auth).")
         os.environ.pop("GOOGLE_APPLICATION_CREDENTIALS", None)
+        return
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = str(resolved)
 
 
 def load_config():
