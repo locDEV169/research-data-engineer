@@ -1,0 +1,6 @@
+/bin/bash: run.sh: Operation not permitted
+/bin/bash: run.sh: Operation not permitted
+Đang tìm 'data analyst' ...
+Xong: 25 job -> data/linkedin_jobs.csv
+Đang tìm 'data analyst' ...
+Xong: 25 job -> data/linkedin_jobs.csv

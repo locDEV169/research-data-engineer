@@ -1,0 +1,12 @@
+# Cookie = mật khẩu. TUYỆT ĐỐI không commit .env
+.env
+
+# Môi trường ảo + output — sinh ra được, không cần lưu
+.venv/
+data/*.csv
+logs/*.log
+
+# Rác của macOS / Python
+.DS_Store
+__pycache__/
+*.pyc
