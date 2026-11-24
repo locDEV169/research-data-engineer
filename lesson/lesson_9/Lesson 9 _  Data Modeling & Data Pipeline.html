@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Huydata | Shopee Data Architecture</title>
+  <style>
+    :root { color-scheme: light; --blue: #1769e0; --ink: #143354; --muted: #60758c; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #fff; color: var(--ink); font: 14px/1.5 Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .page { max-width: 1800px; margin: auto; padding: 0 28px; }
+    header { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 22px 0; border-bottom: 1px solid #e2ebf4; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 8px; background: var(--blue); color: white; font-weight: 800; }
+    .brand strong { display: block; font-size: 21px; }
+    .brand span, .meta, footer { color: var(--muted); font-size: 12px; }
+    .meta { overflow-wrap: anywhere; }
+    .intro { display: flex; align-items: end; justify-content: space-between; gap: 24px; padding: 28px 0 22px; }
+    .eyebrow { margin: 0 0 6px; color: var(--blue); font-weight: 700; font-size: 12px; }
+    h1 { margin: 0; font-size: 30px; line-height: 1.25; letter-spacing: 0; }
+    .subtitle { margin: 8px 0 0; color: var(--muted); }
+    .legend { display: flex; flex-wrap: wrap; gap: 16px; flex-shrink: 0; color: var(--muted); font-size: 12px; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .swatch { width: 10px; height: 10px; border: 1px solid #d9bd70; background: #fff5d8; border-radius: 2px; }
+    .swatch.fact { background: #eaf3ff; border-color: #1769e0; }
+    .swatch.wh { background: #eef3fa; border-color: #6685ad; }
+    .swatch.mart { background: #e8f7f0; border-color: #2c9973; }
+    .diagram { overflow: auto; width: 100%; border-top: 1px solid #e2ebf4; border-bottom: 1px solid #e2ebf4; padding: 16px 0; }
+    .diagram:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+    svg { display: block; width: 100%; min-width: 1480px; height: auto; }
+    svg text { font-family: inherit; letter-spacing: 0; }
+    .zone-title { font-size: 22px; font-weight: 750; fill: #143354; }
+    .zone-dataset { font-size: 14px; fill: #60758c; }
+    .zone-count { font-size: 12px; font-weight: 650; fill: #60758c; }
+    .node rect { fill: #fff; stroke: #c7d7e8; stroke-width: 1.5; }
+    .node.dim rect { stroke: #d9bd70; }
+    .node.fact rect { fill: #eaf3ff; stroke: #1769e0; stroke-width: 2; }
+    .node.wh rect { stroke: #6685ad; stroke-width: 2; }
+    .node.mart rect { stroke: #2c9973; }
+    .kind { font-size: 11px; font-weight: 800; fill: #9a6a0e; }
+    .fact .kind { fill: #1769e0; }
+    .wh .kind { fill: #4f7099; }
+    .mart .kind { fill: #20805f; }
+    .name { font-size: 17px; font-weight: 750; fill: #143354; }
+    .mart .name { font-size: 16px; }
+    .field { font-size: 13px; fill: #526e8b; }
+    .join { fill: none; stroke: #8ca8c7; stroke-width: 1.7; stroke-linejoin: round; }
+    .join-label { fill: #516e8d; font-size: 12px; paint-order: stroke; stroke: #f7fbff; stroke-width: 5px; stroke-linejoin: round; }
+    .flow { fill: none; stroke: #1769e0; stroke-width: 3; marker-end: url(#arrow); }
+    .flow.gold { stroke: #2c9973; marker-end: url(#arrowGold); }
+    .process { font-size: 14px; font-weight: 750; fill: #1769e0; }
+    .note { font-size: 13px; fill: #60758c; }
+    footer { display: flex; justify-content: space-between; gap: 16px; padding: 18px 0 24px; }
+    @media (max-width: 1100px) { .intro { align-items: start; flex-direction: column; gap: 16px; } }
+    @media (max-width: 600px) {
+      .page { padding: 0 16px; }
+      header, footer { align-items: start; flex-direction: column; gap: 10px; }
+      h1 { font-size: 25px; }
+      .intro { padding: 22px 0; }
+      .legend { gap: 12px; }
+    }
+    @media print {
+      @page { size: A3 landscape; margin: 10mm; }
+      .page { padding: 0; }
+      .diagram { overflow: visible; }
+      svg { min-width: 0; }
+      body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">HD</div>
+        <div><strong>Huydata</strong><span>Data Engineer / Analytics Engineer Lab</span></div>
+      </div>
+      <div class="meta">BigQuery · project-9d3c9d87-4adc-4d3b-ac1</div>
+    </header>
+    <main>
+      <div class="intro">
+        <div>
+          <p class="eyebrow">SHOPEE ECOMMERCE ANALYTICS</p>
+          <h1>Mô hình dữ liệu &amp; luồng xử lý</h1>
+          <p class="subtitle">Raw · Dim &amp; Fact → Warehouse · Daily Sales → Mart Gold · Monthly Insights</p>
+        </div>
+        <div class="legend" aria-label="Chú giải loại bảng">
+          <span><i class="swatch"></i>Dimension</span>
+          <span><i class="swatch fact"></i>Fact</span>
+          <span><i class="swatch wh"></i>Warehouse</span>
+          <span><i class="swatch mart"></i>Mart Gold</span>
+        </div>
+      </div>
+      <div class="diagram" tabindex="0" role="region" aria-label="Sơ đồ Raw sang Warehouse và Mart Gold">
+        <svg viewBox="0 0 1700 910" role="img" aria-labelledby="svgTitle svgDesc">
+          <title id="svgTitle">Shopee: Raw Dim–Fact → Warehouse → Mart Gold</title>
+          <desc id="svgDesc">Ba khu vực từ trái sang phải. shopee_raw gồm hai fact orders và order items cùng sáu dimension customer, date, shop, product, brand, category. Cụm raw được join, lọc đơn paid hoặc delivered và tổng hợp thành shopee_wh.wh_fact_sales_daily, sau đó tổng hợp thành ba mart theo tháng trong shopee_mart. Đường nối trong raw thể hiện quan hệ join logic 1 đến nhiều; mũi tên giữa các tầng thể hiện luồng xử lý dữ liệu.</desc>
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#1769e0"/></marker>
+            <marker id="arrowGold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#2c9973"/></marker>
+          </defs>
+          <!-- Dataset boundaries separate table relationships from transformation lineage. -->
+          <g aria-label="Các tầng dữ liệu">
+            <rect x="16" y="16" width="800" height="878" rx="8" fill="#f7fbff" stroke="#d6e6f7"/>
+            <rect x="856" y="16" width="300" height="878" rx="8" fill="#f2f6fb" stroke="#d5e0ed"/>
+            <rect x="1196" y="16" width="488" height="878" rx="8" fill="#f3faf7" stroke="#d6e9df"/>
+            <text x="40" y="58" class="zone-title">01 / Raw · Dim &amp; Fact</text>
+            <text x="40" y="86" class="zone-dataset">shopee_raw</text>
+            <text x="792" y="86" text-anchor="end" class="zone-count">6 DIMENSIONS · 2 FACTS</text>
+            <text x="880" y="58" class="zone-title">02 / Warehouse</text>
+            <text x="880" y="86" class="zone-dataset">shopee_wh</text>
+            <text x="1220" y="58" class="zone-title">03 / Mart Gold</text>
+            <text x="1220" y="86" class="zone-dataset">shopee_mart</text>
+            <text x="1660" y="86" text-anchor="end" class="zone-count">3 MARTS</text>
+          </g>
+          <g aria-label="Quan hệ bảng raw">
+            <path class="join" d="M146 250 V355"/>
+            <text class="join-label" x="158" y="298">1 : N · customer_id</text>
+            <path class="join" d="M406 250 V300 H316 V355"/>
+            <text class="join-label" x="308" y="289">full_date = order_date · 1 : N</text>
+            <path class="join" d="M600 250 V280 H460 V325 H346 V355"/>
+            <text class="join-label" x="481" y="272">1 : N · shop_id</text>
+            <path class="join" d="M666 250 V355"/>
+            <text class="join-label" x="679" y="309">1 : N · shop_id</text>
+            <path class="join" d="M366 422 H490"/>
+            <text class="join-label" x="389" y="407">1 : N · order_id</text>
+            <path class="join" d="M625 495 V575"/>
+            <text class="join-label" x="641" y="540">N : 1 · product_id</text>
+            <path class="join" d="M266 623 H490"/>
+            <text class="join-label" x="302" y="609">1 : N · brand_id</text>
+            <path class="join" d="M266 790 H410 V658 H490"/>
+            <text class="join-label" x="422" y="731">1 : N · category_id</text>
+          </g>
+          <!-- The raw boundary represents the joined dataset feeding the daily warehouse. -->
+          <path class="flow" d="M816 422 H881"/>
+          <text class="process" x="880" y="270">JOIN → FILTER → SUM</text>
+          <text class="note" x="880" y="297">order_status:</text>
+          <text class="note" x="880" y="318">paid / delivered</text>
+          <path class="flow gold" d="M1131 445 H1260"/>
+          <path class="flow gold" d="M1228 445 V255 H1260"/>
+          <path class="flow gold" d="M1228 445 V655 H1260"/>
+          <circle cx="1228" cy="445" r="4" fill="#2c9973"/>
+          <text class="process" x="1260" y="151" style="fill:#20805f">AGGREGATE BY MONTH → RANK</text>
+          <g class="node dim" data-table="dim_customer">
+            <rect x="36" y="150" width="220" height="100" rx="8"/>
+            <text class="kind" x="52" y="174">DIMENSION</text>
+            <text class="name" x="52" y="202">dim_customer</text>
+            <text class="field" x="52" y="230">PK customer_id</text>
+          </g>
+          <g class="node dim" data-table="dim_date">
+            <rect x="296" y="150" width="220" height="100" rx="8"/>
+            <text class="kind" x="312" y="174">DIMENSION</text>
+            <text class="name" x="312" y="202">dim_date</text>
+            <text class="field" x="312" y="230">PK date_id · full_date</text>
+          </g>
+          <g class="node dim" data-table="dim_shop">
+            <rect x="556" y="150" width="220" height="100" rx="8"/>
+            <text class="kind" x="572" y="174">DIMENSION</text>
+            <text class="name" x="572" y="202">dim_shop</text>
+            <text class="field" x="572" y="230">PK shop_id</text>
+          </g>
+          <g class="node fact" data-table="fact_orders">
+            <rect x="96" y="355" width="270" height="140" rx="8"/>
+            <text class="kind" x="112" y="379">FACT · ORDER HEADER</text>
+            <text class="name" x="112" y="407">fact_orders</text>
+            <text class="field" x="112" y="435">PK order_id</text>
+            <text class="field" x="112" y="457">customer_id · shop_id</text>
+            <text class="field" x="112" y="479">order_date · order_status</text>
+          </g>
+          <g class="node fact" data-table="fact_order_items">
+            <rect x="490" y="355" width="270" height="140" rx="8"/>
+            <text class="kind" x="506" y="379">FACT · ORDER LINE</text>
+            <text class="name" x="506" y="407">fact_order_items</text>
+            <text class="field" x="506" y="435">PK order_item_id</text>
+            <text class="field" x="506" y="457">order_id · product_id · shop_id</text>
+            <text class="field" x="506" y="479">quantity · line_gmv</text>
+          </g>
+          <g class="node dim" data-table="dim_product">
+            <rect x="490" y="575" width="270" height="120" rx="8"/>
+            <text class="kind" x="506" y="599">DIMENSION</text>
+            <text class="name" x="506" y="627">dim_product</text>
+            <text class="field" x="506" y="655">PK product_id</text>
+            <text class="field" x="506" y="677">category_id · brand_id · shop_id</text>
+          </g>
+          <g class="node dim" data-table="dim_brand">
+            <rect x="36" y="575" width="230" height="100" rx="8"/>
+            <text class="kind" x="52" y="599">DIMENSION</text>
+            <text class="name" x="52" y="627">dim_brand</text>
+            <text class="field" x="52" y="655">PK brand_id</text>
+          </g>
+          <g class="node dim" data-table="dim_category">
+            <rect x="36" y="740" width="230" height="100" rx="8"/>
+            <text class="kind" x="52" y="764">DIMENSION</text>
+            <text class="name" x="52" y="792">dim_category</text>
+            <text class="field" x="52" y="820">PK category_id</text>
+          </g>
+          <g class="node wh" data-table="wh_fact_sales_daily">
+            <rect x="881" y="355" width="250" height="180" rx="8"/>
+            <text class="kind" x="897" y="379">DAILY SALES</text>
+            <text class="name" x="897" y="407">wh_fact_sales_daily</text>
+            <text class="field" x="897" y="435">product_id · shop_id</text>
+            <text class="field" x="897" y="457">order_date · month_key</text>
+            <text class="field" x="897" y="479">units · gmv</text>
+          </g>
+          <g class="node mart" data-table="mart_top_products_monthly">
+            <rect x="1260" y="190" width="400" height="130" rx="8"/>
+            <text class="kind" x="1276" y="214">GOLD · TOP PRODUCTS</text>
+            <text class="name" x="1276" y="242">mart_top_products_monthly</text>
+            <text class="field" x="1276" y="270">Grain: month × product</text>
+            <text class="field" x="1276" y="292">GMV · units · rank trong tháng</text>
+          </g>
+          <g class="node mart" data-table="mart_top_products_by_category_monthly">
+            <rect x="1260" y="380" width="400" height="160" rx="8"/>
+            <text class="kind" x="1276" y="404">GOLD · TOP PRODUCTS BY CATEGORY</text>
+            <text class="name" x="1276" y="432">mart_top_products_by_category_monthly</text>
+            <text class="field" x="1276" y="460">Grain: month × category × product</text>
+            <text class="field" x="1276" y="482">GMV · units · rank trong ngành hàng</text>
+          </g>
+          <g class="node mart" data-table="mart_category_trend_monthly">
+            <rect x="1260" y="590" width="400" height="130" rx="8"/>
+            <text class="kind" x="1276" y="614">GOLD · CATEGORY TREND</text>
+            <text class="name" x="1276" y="642">mart_category_trend_monthly</text>
+            <text class="field" x="1276" y="670">Grain: month × category</text>
+            <text class="field" x="1276" y="692">GMV · units · num_shops · avg_price</text>
+          </g>
+          <text class="note" x="880" y="572">Grain: product × shop × date</text>
+          <text class="note" x="880" y="595">SUM(quantity) → units</text>
+          <text class="note" x="880" y="618">SUM(line_gmv) → gmv</text>
+          <text class="zone-count" x="40" y="873">QUAN HỆ JOIN CHÍNH · 1 : N</text>
+          <text class="zone-count" x="880" y="873">TỔNG HỢP THEO NGÀY</text>
+          <text class="zone-count" x="1220" y="873">TỔNG HỢP THEO THÁNG · API / BI</text>
+        </svg>
+      </div>
+    </main>
+    <footer><span>Huydata · Data Engineering Lab</span><span>BigQuery / Shopee Ecommerce</span></footer>
+  </div>
+</body>
+</html>
